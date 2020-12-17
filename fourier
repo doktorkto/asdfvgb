@@ -1,0 +1,69 @@
+from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+import cmath
+import math
+import pandas
+Image.__version__
+'1.1.7'
+
+def flog(f: np.array):
+    f2 = f
+    for i in range(0, 1280):
+        for k in range(0, 960):
+            f2[i, k] = cmath.log(f[i, k])
+    return f2
+
+def nonflog(f: np.array):
+    f2 = np.copy(f)
+    for i in range(0, 1280):
+        for k in range(0, 960):
+            f2[i, k] = math.log(abs(f[i, k]))
+    return f2
+
+def nonlog(f: np.array):
+    f2 = np.copy(f)
+    for i in range(0, 960):
+        f2[i] = math.log(abs(f[i])+1)
+    return f2
+
+img = Image.open('0.bmp').convert('L')
+data = np.asarray(img.getdata()).reshape(img.size)
+#print(data[0])
+fft = np.fft.fft2(data)
+fft2 = np.copy(fft)
+fft3 = np.fft.fftshift(fft)
+fft[0, 0] = 0
+#plt.imshow(np.abs(np.fft.fftshift(fft)), interpolation='nearest')
+#plt.show()
+
+#plt.imshow(np.abs(np.fft.fftshift(flog(fft2))), interpolation='nearest')
+#plt.show()
+
+#plt.imshow(nonflog(np.abs(fft3)), interpolation='nearest')
+#plt.show()
+
+#plt.imshow(np.abs(np.fft.fftshift(fft))[150:210, 210:270], interpolation='nearest')
+#plt.show()
+
+#plt.imshow(np.abs(np.fft.fftshift((nonflog(fft3))))[150:210, 210:270], interpolation='nearest')
+#plt.show()
+
+c = pandas.DataFrame(nonlog(fft[0]))
+c.plot()
+d = pandas.DataFrame(nonlog(fft3[:, 0]))
+d.plot()
+e = pandas.DataFrame(data[0])
+e.plot()
+f = pandas.DataFrame(data[:, 0])
+f.plot()
+
+si = np.copy(fft)
+for i in range(0, 1280):
+    for j in range(0,960):
+        si[i,j] = math.sin(200 * i)
+f1 = np.fft.fft2(si)
+f2 = np.fft.fftshift(f1)
+g = pandas.DataFrame(f2[0])
+g.plot()
+#print(img.size)
