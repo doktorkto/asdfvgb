@@ -1,0 +1,50 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+def l1(x): #Ряд едениц
+    a = [None] * x
+    for i in range(0, x):
+        a[i] = 1
+    return a
+
+def l2(x): #Возрастающий ряд от 0 до х сд дроблением на 0.1
+    a = [None]*(10*x)
+    for i in range(0, 10*x):
+        a[i] = 0.1
+    for i in range(0, 10*x):
+            a[i] = a[i] + i*0.1
+    return a
+
+def morethetas(x, l, n): #сумма всех полей, выраженная через разности тета-функций
+    b = np.array([None]*(10*l))
+    for i in range(0, 10*l):
+        b[i] = 0
+    for i in range(0, n):
+        b = b - np.heaviside(x - (i + 1)*np.array(l1(10*l)) - 2*i*np.array(l1(10*l)), 1) + np.heaviside(x - 3*i*np.array(l1(10*l)), 1)
+    return b
+
+def riemann(x: np.array, b, y): #интегрирование по риману. Получается, что delta x_i - расстояния между точками, раное 0.25; x - набор значений в точках разбиения
+    sum = 0
+    for i in range(y, b + y):
+        sum = sum + x[i]
+    sum = 0.5 * sum / (b)
+    return sum
+
+m = 28
+a = 2
+nym = l2(m)
+f = morethetas(nym, m, 10)
+s = riemann(f, 10, 0)
+graph = [None]*(m - a)*10
+for i in range(0, 260):
+    graph[i] = riemann(f, a*10, i)
+
+g = [None]*29
+
+
+h = pd.DataFrame(graph)
+h.plot
+
+g = pd.DataFrame(f)
+g.plot()
