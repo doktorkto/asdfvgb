@@ -17,34 +17,56 @@ def l2(x): #Возрастающий ряд от 0 до х сд дроблени
     return a
 
 def morethetas(x, l, n): #сумма всех полей, выраженная через разности тета-функций
-    b = np.array([None]*(10*l))
-    for i in range(0, 10*l):
+    b = np.array([None]*(20*l + 1))
+    for i in range(0, 20*l + 1):
         b[i] = 0
     for i in range(0, n):
-        b = b - np.heaviside(x - (i + 1)*np.array(l1(10*l)) - 2*i*np.array(l1(10*l)), 1) + np.heaviside(x - 3*i*np.array(l1(10*l)), 1)
+        b = b - np.heaviside(x - (i + 1)*np.array(l1(20*l + 1)) - 2*i*np.array(l1(20*l + 1)), 0) + np.heaviside(x - 3*i*np.array(l1(20*l + 1)), 0)
     return b
 
-def riemann(x: np.array, b, y): #интегрирование по риману. Получается, что delta x_i - расстояния между точками, раное 0.25; x - набор значений в точках разбиения
+def riemann(x: np.array, l, b, y): #интегрирование по риману, x - набор значений функции, l - длина этого набора, b - кси, а у - х в изначальном интеграле
     sum = 0
-    for i in range(y, b + y):
-        sum = sum + x[i]
-    sum = 0.5 * sum / (b)
+    for i in range(y - b + l, y + b + l):   #сдвиг здесь есть из-за того, как определяется массив nym: первая половина - набор нулей, соответствующих отрицательной части функции
+        sum = sum + x[-i]  
+    sum = 0.1/(2*b*0.1) * sum
     return sum
 
-m = 28
-a = 2
+m = 43   #задание длины всего отрезка; т.к. в функциях фигурирует именно этот параметр, а не число 28 (здесь 280), то можно подобрать такой параметро, чтобы было видно как можно больший участок графиков. Число конденсаторов не зависит от того параметра
 nym = l2(m)
-f = morethetas(nym, m, 10)
-s = riemann(f, 10, 0)
-graph = [None]*(m - a)*10
-for i in range(0, 260):
-    graph[i] = riemann(f, a*10, i)
+num = [None]*(20*m + 1)   #num - расширенный на отрицательную ось nym, который есть просто набор возрастающих чисел
+for i in range(0, 20*m + 1):
+    if i< 10*m + 1:
+        num[i] = 0
+    else:
+        num[i] = nym[i - 10*m - 1]
 
-g = [None]*29
+f = morethetas(num, m, 10)   #построение графика Е_micro
 
+g = pd.DataFrame(f)   #посттроение  графика для поля E_micro. Из-за небольшого конфуза: до 280 - отрицательная часть оси, после - положительная. Масштаб: 0.1а (такова цена деления
+g.plot()        
 
-h = pd.DataFrame(graph)
-h.plot
+a = 2   #Здесь 2 - это 0.2а в масштабе 0.1
+graph = [None]*(2*m*10 - a) #нужно это уменьшение массива для того, чтобы функция нормально работала
+for i in range(0, m*10 - a):   #создание массива для графика Е(х) для заданного кси
+    graph[i] = riemann(f, m, a, i)
 
-g = pd.DataFrame(f)
-g.plot()
+h = pd.DataFrame(graph) #построение графика уже для Е(х)
+h.plot() #Здесь и далее в графиках Е(х) 
+
+a = 20   #Здесь 2 - это 2а в масштабе 0.1
+nym = l2(m)
+graph = [None]*(m*10 - a)
+for i in range(0, m*10 - a):
+    graph[i] = riemann(f, m, a, i)
+
+h = pd.DataFrame(graph)   #построение графика уже для Е(х)
+h.plot()
+
+a = 200   #Здесь 2 - это 20а в масштабе 0.1
+nym = l2(m)
+graph = [None]*(m*10 - a)
+for i in range(0, 10*m - a):
+    graph[i] = riemann(f, m, a, i)
+
+h = pd.DataFrame(graph)    #построение графика уже для Е(х)
+h.plot()
